@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>點擊看驚喜！</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #ff69b4;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft JhengHei", sans-serif;
+            transition: background-color 2s;
+        }
+        .popup-img {
+            position: absolute;
+            width: 250px;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgb(255, 176, 225);
+            z-index: 10;
+            transition: opacity 1s, transform 0.5s;
+        }
+        #birthday-msg {
+            display: none;
+            color: #ff69b4;
+            font-size: 5rem;
+            text-shadow: 0 0 20px #fff, 0 0 30px #ff69b4;
+            z-index: 9999;
+            text-align: center;
+            animation: heartBeat 1.5s infinite;
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        #hint {
+            color: white;
+            z-index: 10000;
+            cursor: pointer;
+            font-size: 2rem;
+            border: 2px solid white;
+            padding: 20px;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hint">🎂 點擊螢幕開啟禮物 🎁</div>
+    <div id="birthday-msg">✨ 生日快樂！ ✨</div>
+
+    <audio id="bgMusic" src="birthday.mp3" preload="auto"></audio>
+
+    <script>
+        // 準備 40 張照片路徑
+        const images = [];
+        for(let i=1; i<=40; i++) {
+            images.push(`img/${i}.jpg`); // 確保你有這些檔案
+        }
+
+        let count = 0;
+        let timer = null;
+        const music = document.getElementById('bgMusic');
+
+        function spawnImage() {
+            if (count >= images.length) {
+                clearInterval(timer);
+                showBirthday();
+                return;
+            }
+
+            const img = document.createElement('img');
+            img.src = images[count];
+            img.className = 'popup-img';
+            
+            const x = Math.random() * (window.innerWidth - 250);
+            const y = Math.random() * (window.innerHeight - 250);
+            const rotate = (Math.random() - 0.5) * 60;
+            
+            img.style.left = x + 'px';
+            img.style.top = y + 'px';
+            img.style.transform = `rotate(${rotate}deg)`;
+            
+            document.body.appendChild(img);
+            count++;
+        }
+
+        function showBirthday() {
+            const allImgs = document.querySelectorAll('.popup-img');
+            allImgs.forEach(img => {
+                img.style.opacity = '0.2';
+                img.style.transform += ' scale(0.8)';
+            });
+            
+            document.getElementById('birthday-msg').style.display = 'block';
+            document.body.style.backgroundColor = '#fff0f5';
+        }
+
+        // 核心點擊事件
+        document.addEventListener('click', () => {
+            // 1. 隱藏提示
+            document.getElementById('hint').style.display = 'none';
+            
+            // 2. 播放音樂
+            music.play().catch(e => console.log("音樂播放失敗，請檢查檔案路徑:", e));
+            
+            // 3. 開始噴照片
+            if (!timer) {
+                timer = setInterval(spawnImage, 200); // 每 0.2 秒一張
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
